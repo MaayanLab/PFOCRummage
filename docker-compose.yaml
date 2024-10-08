@@ -1,49 +1,49 @@
 version: '3.9'
 services:
-  pfcorummage-app:
+  pfocrummage-app:
     build: .
     platform: linux/amd64
-    image: maayanlab/pfcorummage:0.0.1
+    image: maayanlab/pfocrummage:0.0.1
     environment:
-      - PUBLIC_URL=https://pfcorummage.maayanlab.cloud
-      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@pfcorummage-postgres/$POSTGRES_DB
+      - PUBLIC_URL=https://pfocrummage.maayanlab.cloud
+      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@pfocrummage-postgres/$POSTGRES_DB
       - AUTHORIZATION_HEADER=$AUTHORIZATION_HEADER
       - NODE_ENV=production
-      - ENRICH_URL=http://pfcorummage-enrich:8000
+      - ENRICH_URL=http://pfocrummage-enrich:8000
       - NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
     ports:
       - 3000:3000
     volumes:
       - ./data/bot/output-clean.gmt:/app/public/latest.gmt:ro
-  pfcorummage-enrich:
+  pfocrummage-enrich:
     build: enrich
     platform: linux/amd64
-    image: maayanlab/pfcorummage-enrich:0.0.1
+    image: maayanlab/pfocrummage-enrich:0.0.1
     environment:
-      - 'ROCKET_DATABASES={postgres={url="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pfcorummage-postgres/${POSTGRES_DB}"}}'
+      - 'ROCKET_DATABASES={postgres={url="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pfocrummage-postgres/${POSTGRES_DB}"}}'
     ports:
       - 8000:8000
-  pfcorummage-postgres:
+  pfocrummage-postgres:
     build: db
     platform: linux/amd64
-    image: maayanlab/pfcorummage-postgres:0.0.1
+    image: maayanlab/pfocrummage-postgres:0.0.1
     environment:
       - POSTGRES_DB
       - POSTGRES_USER
       - POSTGRES_PASSWORD
-      - ENRICH_URL=http://pfcorummage-enrich:8000
+      - ENRICH_URL=http://pfocrummage-enrich:8000
     ports:
       - 5432:5432
     volumes:
       - ./data/postgres/:/var/lib/postgresql/data
-  pfcorummage-bot:
+  pfocrummage-bot:
     build: bot
     platform: linux/amd64
-    image: maayanlab/pfcorummage-bot:0.0.1
+    image: maayanlab/pfocrummage-bot:0.0.1
     command: ["bash", "-c", "cd /work/data && touch log && tail -f log"]
     environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pfcorummage-postgres:5432/${POSTGRES_DB}
-      - ENRICH_URL=http://pfcorummage-enrich:8000
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pfocrummage-postgres:5432/${POSTGRES_DB}
+      - ENRICH_URL=http://pfocrummage-enrich:8000
       - API_KEY
       - EMAIL
     volumes:
