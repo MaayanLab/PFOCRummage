@@ -24,13 +24,22 @@ export default function HomeLayout({ children }: React.PropsWithChildren<{}>) {
             <span className="whitespace-nowrap"> Rummage through <Stats bold show_gene_sets /></span>
           </h1>
           <div>
-            <span className="whitespace-nowrap">extracted from figures of</span>
-            <span className="whitespace-nowrap"> <Stats bold show_pmcs /></span>
-            <p> to find the most similar gene sets that match your query.</p>
+            <span className="whitespace-nowrap">extracted from figures of pathways found in </span><Stats bold show_pmcs />.
           </div>
           <div className="mt-5">
-          <div className="whitespace-nowrap">PFOCRummage provides enrichment analysis on gene sets extracted by the</div> 
-             <span className="whitespace-nowrap"> <a href='https://pfocr.wikipathways.org/' target='_blank' style={{ textDecoration: 'underline' }}>Pathway Figure OCR</a> project from PubMed Central articles.</span>
+          <div className="whitespace-nowrap"> PFOCRummage is a gene set search engine for finding gene sets </div>
+          <div><span className="whitespace-nowrap"> extracted by for the <a href='https://pfocr.wikipathways.org/' target='_blank' style={{ textDecoration: 'underline' }}>Pathway Figure Optical Character Recognition (PFOCR)</a></span> </div>
+          <div>resource from PubMed Central (PMC) articles.</div>
+          <br/>
+          <div>
+
+            Query PubMed Central and receive gene sets extracted 
+            
+            
+            <div>
+            from images of pathways in research publications.
+          </div>
+          </div>
           </div>
           </React.Suspense>
         </div>

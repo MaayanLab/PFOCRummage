@@ -135,9 +135,9 @@ export default function RootLayout({
                 </ul>
               </div>
               <div className="text-center">
-              <p className='mt-7'>
+              <p className='mt-3'>
                   <Link href="https://gladstone.org/people/alex-pico" target="_blank" rel="noopener noreferrer">
-                    <Image src={'/images/GladstoneLogoWh.png'} width={150} height={250} alt={'Gladstone Institutes'}/>
+                    <Image src={'/images/picolablogo.png'} width={150} height={250} alt={'Pico Lab'}/>
                   </Link>
                 </p>
               </div>
