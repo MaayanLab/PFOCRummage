@@ -16,16 +16,16 @@ cp .env.example .env
 # review & edit .env
 
 # start db
-docker-compose up -d PFOCRummage-postgres
+docker-compose up -d pfocrummage-postgres
 
 # create db/ensure it's fully migrated
 dbmate up
 
 # start companion API
-docker-compose up -d PFOCRummage-enrich
+docker-compose up -d pfocrummage-enrich
 
 # start app (production)
-docker-compose up -d PFOCRummage-app
+docker-compose up -d pfocrummage-app
 # start app (development)
 npm run dev
 ```
