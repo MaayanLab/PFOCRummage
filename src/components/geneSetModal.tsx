@@ -112,7 +112,7 @@ export default function GeneSetModal({ geneset, term, showModal, setShowModal }:
                                     router.push(`/enrich?dataset=${id}`)
                                 }
                             }}>
-                            Enrich on Rummagene
+                            Enrich on PFOCRummage
                         </button>
                         <span className={classNames("loading", "w-6", { 'hidden': !loading })}></span>
                         <div className={classNames("alert alert-error", { 'hidden': !error })}>{error?.message ?? null}</div>

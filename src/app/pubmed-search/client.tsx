@@ -55,7 +55,7 @@ function PubMedSearchResults({ search }: { search: string }) {
   if (error) return <div className="text-center p-5"><div className="text-center"><Image className={'rounded mx-auto'} src={'/images/PFOCRummage.gif'} width={125} height={250} alt={'Loading...'} /> </div>Failed to fetch articles from PubMed Central... trying again in a few seconds.</div>
   if (isLoading) return <Loading/>
   if (!pmcData?.esearchresult?.idlist || !pmcsInDb) return null
-  if (pmcsInDb.length < 1) return <div className="text-center p-5">Your query returned {Intl.NumberFormat("en-US", {}).format(pmcCount)} articles, but none of them are contained in the Rummagene database. Please try refining your query.</div>
+  if (pmcsInDb.length < 1) return <div className="text-center p-5">Your query returned {Intl.NumberFormat("en-US", {}).format(pmcCount)} articles, but none of them are contained in the PFOCRummage database. Please try refining your query.</div>
   return (
     <div className="flex flex-col gap-2 my-2">
       <h2 className="text-md font-bold">

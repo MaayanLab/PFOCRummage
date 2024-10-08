@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     body: JSON.stringify({
       term: geneSet.data.geneSetByTerm.term,
       genes: geneSet.data.geneSetByTerm.genes.nodes.map(gene => gene.symbol),
-      description: `Rummagene ${geneSet.data.geneSetByTerm.description}`,
+      description: `PFCOR ${geneSet.data.geneSetByTerm.description}`,
     }),
   })
   const { session_id } = await req.json()

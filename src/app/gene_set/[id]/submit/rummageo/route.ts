@@ -23,7 +23,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       `,
       variables: {
         genes: geneSet.data.geneSetByTerm?.genes.nodes.map(node => node.symbol),
-        description: `Rummagene ${geneSet.data.geneSetByTerm.term}`,
+        description: `PFOCR ${geneSet.data.geneSetByTerm.term}`,
       },
     }),
   })

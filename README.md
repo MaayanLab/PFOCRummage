@@ -2,7 +2,7 @@
 
 <https://PFCORummage.maayanlab.cloud/>
 
-This is a webserver for gene set enrichment analysis on a very large gene set library. The [bot](https://github.com/MaayanLab/rummagene/tree/main/bot) extracts the monthly updates from the [WikiPathways PFOCR releases](https://data.wikipathways.org/pfocr/current/).
+This is a webserver for gene set enrichment analysis on a very large gene set library. The [bot](https://github.com/MaayanLab/pfocrummage/tree/main/bot) extracts the monthly updates from the [WikiPathways PFOCR releases](https://data.wikipathways.org/pfocr/current/).
 
 ## Development
 Rather than splitting up the meta and data APIs, all functionality is incorporated into a postgres database.

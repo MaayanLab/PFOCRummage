@@ -63,7 +63,7 @@ function EnrichmentResults({ userGeneSet, setModalGeneSet }: { userGeneSet?: Fet
       <h2 className="text-md font-bold">
         {!enrichmentResults?.currentBackground?.enrich ?
           <>Rummaging through <Stats show_gene_sets />.</>
-          : <>After rummaging through <Stats show_gene_sets />. PFOCRummage <Image className="inline-block rounded" src="/images/PFOCRummageBlack.png" width={50} height={100} alt="Rummagene"></Image> found {Intl.NumberFormat("en-US", {}).format(enrichmentResults?.currentBackground?.enrich?.totalCount || 0)} statistically significant matches.</>}
+          : <>After rummaging through <Stats show_gene_sets />. PFOCRummage <Image className="inline-block rounded" src="/images/PFOCRummageBlack.png" width={50} height={100} alt="PFOCRummage"></Image> found {Intl.NumberFormat("en-US", {}).format(enrichmentResults?.currentBackground?.enrich?.totalCount || 0)} statistically significant matches.</>}
       </h2>
       <form
         className="join flex flex-row place-content-end place-items-center"
@@ -200,7 +200,7 @@ function EnrichmentResults({ userGeneSet, setModalGeneSet }: { userGeneSet?: Fet
                                 setModalGeneSet({
                                   type: 'GeneSetOverlap',
                                   id: geneSetId,
-                                  description: `${userGeneSet?.userGeneSet?.description || 'User gene set'} & ${pmcid_figure || 'Rummagene gene set'}`,
+                                  description: `${userGeneSet?.userGeneSet?.description || 'User gene set'} & ${pmcid_figure || 'PFOCR gene set'}`,
                                   genes,
                                 })
                               }}

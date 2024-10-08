@@ -25,7 +25,7 @@ export function TermSearchResults({ terms }: { terms: string }) {
   return (
     <div className="flex flex-col gap-2 my-2">
       <h2 className="text-md font-bold">
-        After rummaging through <Stats show_gene_sets />. PFOCRummage <Image className="inline-block rounded" src="/images/PFOCRummageBlack.png" width={50} height={100} alt="PFOCRummagene"></Image> found your search term in the description of {data.geneSetTermSearchDesc?.totalCount} PFOCR gene sets.
+        After rummaging through <Stats show_gene_sets />. PFOCRummage <Image className="inline-block rounded" src="/images/PFOCRummageBlack.png" width={50} height={100} alt="PFOCRummage"></Image> found your search term in the description of {data.geneSetTermSearchDesc?.totalCount} PFOCR gene sets.
       </h2>
       {data.geneSetTermSearchDesc?.nodes && data.geneSetTermSearchDesc?.nodes.length > 0 ? <TermTable terms={data.geneSetTermSearchDesc?.nodes}></TermTable> : null}
     </div>

@@ -20,7 +20,7 @@ export default async function About() {
         
         <div className="flex-col justify-center mx-auto">
         <h2 className="title text-xl font-medium mb-3">About PFOCRummage</h2>
-        <Image className={'rounded float-right ml-5'} src={'/images/PFOCRummageBlack.png'} width={250} height={250} alt={'Rummagene'}></Image>
+        <Image className={'rounded float-right ml-5'} src={'/images/PFOCRummageBlack.png'} width={250} height={250} alt={'PFOCRummage'}></Image>
           <p className="text-justify max-w-5xl">
           Many biomedical research papers are published contain diagrams containing gene symbols representing pathways and biological processes. 
           These diagrams capture the relationships between genes, cells, diseases and other perturbations. The <a  className='underline cursor' href='https://pfocr.wikipathways.org/' target='_blank'>Pathway Figure Optical Character Recognition (PFOCR)</a> 

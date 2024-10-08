@@ -17,7 +17,7 @@ export default function HomeLayout({ children }: React.PropsWithChildren<{}>) {
             PFOCRummage
           </h2>
           <div className='inline-flex'>
-            <Image className={'rounded'} src={'/images/PFOCRummageBlack.png'} width={225} height={225} alt={'Rummagene'}></Image>
+            <Image className={'rounded'} src={'/images/PFOCRummageBlack.png'} width={225} height={225} alt={'PFOCRummage'}></Image>
           </div>
           <React.Suspense fallback={<div className="text-center p-5"><Image className={'rounded mx-auto'} src={'/images/PFOCRummage.gif'} width={125} height={250} alt={'Loading...'}/> </div>}>
           <h1 className="text-2xl font-bold">

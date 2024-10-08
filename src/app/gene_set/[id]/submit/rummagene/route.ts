@@ -11,7 +11,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     mutation: AddUserGeneSetDocument,
     variables: {
       genes: geneSet.data.geneSetByTerm?.genes.nodes.map(node => node.symbol),
-      description: `Rummagene ${geneSet.data.geneSetByTerm.term}`,
+      description: `PFCOR ${geneSet.data.geneSetByTerm.term}`,
     },
   })
   if (!userGeneSet.data?.addUserGeneSet?.userGeneSet?.id) return new Response(JSON.stringify({error: 'Failed to Register'}), { status: 500 })

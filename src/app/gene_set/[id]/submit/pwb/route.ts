@@ -14,7 +14,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       data:{
         "gene_set": {
           "type":"Input[Set[Gene]]",
-          "value":{"description": `Rummagene ${geneSet.data.geneSetByTerm.term}`, "set": geneSet.data.geneSetByTerm.genes.nodes.map(gene => gene.symbol)}
+          "value":{"description": `PFOCR ${geneSet.data.geneSetByTerm.term}`, "set": geneSet.data.geneSetByTerm.genes.nodes.map(gene => gene.symbol)}
         }
       },
       workflow:[

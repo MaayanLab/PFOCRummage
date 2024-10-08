@@ -11,7 +11,7 @@ import Analytics from '@/app/analytics'
 
 export const metadata: Metadata = {
   title: 'PFOCRummage',
-  description: 'Search gene sets extracted from PubMed Central (PMC) article figures',
+  description: 'Search gene sets extracted from PubMed Central (PMC) article pathway figures',
   keywords: [
     'big data',
     'bioinformatics',
@@ -60,17 +60,17 @@ export const metadata: Metadata = {
     'tissue',
     'transcriptomics',
   ].join(', '),
-  metadataBase: new URL('https://rummagene.com'),
+  metadataBase: new URL('https://pfocrummage.maayanlab.cloud/'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'PFOCRummage',
-    description: 'Find published gene sets from supporting tables of PubMed Central (PMC) articles',
-    url: 'https://rummagene.com',
+    description: 'Search gene sets extracted from PubMed Central (PMC) article pathway figures',
+    url: 'https://pfocrummage.maayanlab.cloud',
     siteName: 'PFOCRummage',
     images: [{
-      url: 'https://rummagene.com/images/PFOCRummageBlack.png',
+      url: 'https://pfocrummage.maayanlab.cloud/images/PFOCRummageBlack.png',
       width: 640,
       height: 671,
     }],
@@ -128,7 +128,7 @@ export default function RootLayout({
                 <ul>
                   <li><Link href="mailto:avi.maayan@mssm.edu" target="_blank">Contact Us</Link></li>
                   <li>
-                    <Link href="https://github.com/MaayanLab/rummagene" target="_blank" rel="noopener noreferrer">
+                    <Link href="https://github.com/MaayanLab/pfocrummage" target="_blank" rel="noopener noreferrer">
                       Source Code
                     </Link>
                   </li>
