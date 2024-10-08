@@ -56,5 +56,5 @@ services:
       # * day of month
       # * month of year
       # 1 day of week (monday)
-      ofelia.job-exec.update-db.schedule: "0 0 9 * * 1"
+      ofelia.job-exec.update-db.schedule: "0 8 21 * *"
       ofelia.job-exec.update-db.command: "/bin/sh -c '/work/bot.sh > /work/data/log 2> /work/data/log'"
