@@ -2,7 +2,7 @@
 
 <https://PFCORummage.maayanlab.cloud/>
 
-This is a webserver for gene set enrichment analysis on a very large gene set -- one constructed from the . The [bot](https://github.com/MaayanLab/rummagene/tree/main/bot) does the monthly update from the [WikiPathways PFOCR releases](https://data.wikipathways.org/pfocr/current/).
+This is a webserver for gene set enrichment analysis on a very large gene set library. The [bot](https://github.com/MaayanLab/rummagene/tree/main/bot) extracts the monthly updates from the [WikiPathways PFOCR releases](https://data.wikipathways.org/pfocr/current/).
 
 ## Development
 Rather than splitting up the meta and data APIs, all functionality is incorporated into a postgres database.
@@ -16,16 +16,16 @@ cp .env.example .env
 # review & edit .env
 
 # start db
-docker-compose up -d postgres
+docker-compose up -d PFOCRummage-postgres
 
 # create db/ensure it's fully migrated
 dbmate up
 
 # start companion API
-docker-compose up -d enrich
+docker-compose up -d PFOCRummage-enrich
 
 # start app (production)
-docker-compose up -d app
+docker-compose up -d PFOCRummage-app
 # start app (development)
 npm run dev
 ```
