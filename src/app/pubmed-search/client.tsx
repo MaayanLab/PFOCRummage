@@ -142,7 +142,7 @@ export default function PubMedSearchClientPage(props: { searchParams?: { q?: str
               type="submit"
               className="btn normal-case"
             >Search PMC</button>
-            <div className='ml-10'>Query PubMed Central and receive gene sets extracted from the returned papers.</div>
+            <div className='ml-10'>Query PMC to receive gene sets extracted from diagrams of pathways in research papers</div>
           </form>
           <p className="prose p-2">
             try an example:&nbsp;

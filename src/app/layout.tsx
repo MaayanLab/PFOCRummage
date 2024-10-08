@@ -134,20 +134,6 @@ export default function RootLayout({
                   </li>
                 </ul>
               </div>
-              <div className="text-center">
-              <p className='mt-3'>
-                  <Link href="https://gladstone.org/people/alex-pico" target="_blank" rel="noopener noreferrer">
-                    <Image src={'/images/picolablogo.png'} width={150} height={250} alt={'Pico Lab'}/>
-                  </Link>
-                </p>
-              </div>
-              <div className="text-center">
-              <p>
-                  <Link href="https://labs.icahn.mssm.edu/" target="_blank" rel="noopener noreferrer">
-                    <Image src={'/images/ismms_white.png'} width={150} height={250} alt={'Ma&apos;ayan Lab'}/>
-                  </Link>
-                </p>
-              </div>
               <div className="text-center pt-5">
               <p>
                 <Link href="https://labs.icahn.mssm.edu/maayanlab/" target="_blank" rel="noopener noreferrer">
@@ -155,6 +141,22 @@ export default function RootLayout({
                 </Link>
                 </p>
               </div>
+              
+              <div className="text-center">
+              <p>
+                  <Link href="https://labs.icahn.mssm.edu/" target="_blank" rel="noopener noreferrer">
+                    <Image src={'/images/ismms_white.png'} width={150} height={250} alt={'Ma&apos;ayan Lab'}/>
+                  </Link>
+                </p>
+              </div>
+              <div className="text-center">
+              <p className='mt-3'>
+                  <Link href="https://gladstone.org/people/alex-pico" target="_blank" rel="noopener noreferrer">
+                    <Image src={'/images/picolablogo.png'} width={160} height={250} alt={'Pico Lab'}/>
+                  </Link>
+                </p>
+              </div>
+              
               <div className="text-center pt-7">
                 <ul>
                   <li>

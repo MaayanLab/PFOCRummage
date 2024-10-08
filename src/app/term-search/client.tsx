@@ -45,7 +45,7 @@ export default function TermSearchClientPage(props: { searchParams?: { page?: st
   if (!queryString.q) {
     return (
       <HomeLayout>
-        <h1 className="text-xl">Query extracted gene set table titles to find relevant gene sets</h1>
+        <h1 className="text-xl">Query pathway diagrams based on their legends to find relevant gene sets</h1>
         <form
           className="flex flex-col items-center gap-2"
           onSubmit={evt => {
