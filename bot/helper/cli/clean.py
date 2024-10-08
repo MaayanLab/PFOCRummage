@@ -1,8 +1,10 @@
 import click
 from pathlib import Path
 from helper.cli import cli
+from maayanlab_bioinformatics.harmonization import ncbi_genes_lookup
 
-lookup = None
+lookup = ncbi_genes_lookup(filters=None)
+
 
 def unique(L):
   S = set()
@@ -19,16 +21,9 @@ def unique(L):
 def clean(input, output):
   import re
   def gene_lookup(value):
-    ''' Don't allow pure numbers or spaces--numbers can typically match entrez ids
+    '''  match entrez ids
     '''
-    if type(value) != str: return None
-    if re.search(r'\s', value): return None
-    if re.match(r'\d+(\.\d+)?', value): return None
-    global lookup
-    if lookup is None:
-      import json
-      with open('lookup.json', 'r') as fr:
-        lookup = json.load(fr).get
+    if lookup(value) is None: return value
     return lookup(value)
 
   terms = set()
@@ -51,5 +46,5 @@ def clean(input, output):
               sep='\t',
               file=fw,
             )
-        except:
-          print('Error processing', line)
+        except Exception as e:
+          print('Error processing', e, line)

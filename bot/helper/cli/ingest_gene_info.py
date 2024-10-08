@@ -49,7 +49,7 @@ def ensure_gene_summary(chunk_size=100):
     data = try_fetch_json(url, 3)
     result = []
     for g in chunk_genes:
-      result.append([g, data['result'][str(g)]['summary'] if str(g) in data['result'] else ''])
+      result.append([g, data['result'][str(g)]['summary'] if data and str(g) in data['result'] else ''])
     pd.DataFrame(result, columns=['GeneID', 'summary']).to_csv(gene_summary_path, index=False, mode='a', sep='\t', header=(i==0))
   return gene_summary_path
 

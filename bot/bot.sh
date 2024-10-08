@@ -5,12 +5,11 @@
 PYTHON=python
 which $PYTHON > /dev/null || exit 1
 
-WORK_DIR=data/$(date +%Y-%m-%d)
+WORK_DIR=data
 if [ -d $WORK_DIR ]; then rm -r $WORK_DIR; fi
 mkdir -p $WORK_DIR
-ln -s ../done.txt $WORK_DIR/done.txt
 
-echo "assembling output.gmt... (new gene sets extracted from PMC articles)"
+echo "assembling output.gmt... (checking for new release from Wikipathways)"
 PTH=$WORK_DIR $PYTHON ./download_extract.py || exit 1
 test -f $WORK_DIR/output.gmt || exit 1
 test -f $WORK_DIR/done.new.txt || exit 1

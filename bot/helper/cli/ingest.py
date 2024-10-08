@@ -68,7 +68,7 @@ def import_gene_set_library(
     })
 
   existing = {
-    (row['term'], row['description'], row['hash'])
+    (row['term'])
     for row in plpy.cursor('select term, description, hash from app_public_v2.gene_set', tuple())
   }
 
@@ -83,7 +83,7 @@ def import_gene_set_library(
         n_gene_ids=len(gene_set['genes']),
       )
       for gene_set in new_gene_sets
-      if (gene_set['term'], gene_set['description'], gene_set['hash']) not in existing
+      if (gene_set['term']) not in existing
     ),
     total=len(new_gene_sets) - len(existing),
     desc='Inserting new genesets...'),
