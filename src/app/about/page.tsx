@@ -22,11 +22,10 @@ export default async function About() {
         <h2 className="title text-xl font-medium mb-3">About PFOCRummage</h2>
         <Image className={'rounded float-right ml-5'} src={'/images/PFOCRummageBlack.png'} width={250} height={250} alt={'PFOCRummage'}></Image>
           <p className="text-justify max-w-5xl">
-          Many biomedical research papers are published contain diagrams containing gene symbols representing pathways and biological processes. 
-          These diagrams capture the relationships between genes, cells, diseases and other perturbations. The <a  className='underline cursor' href='https://pfocr.wikipathways.org/' target='_blank'>Pathway Figure Optical Character Recognition (PFOCR)</a> 
-          <span> </span>is a open science initiative which extracts gene sets from published articles in PubMed Central. Currently PFOCRummage serves <Stats show_gene_sets bold /> from <Stats show_pmcs bold />.
-          These gene sets are served for enrichment analysis, free text and term search. Users of PFOCRummage can submit their own gene sets to
-          find matching gene sets ranked by their overlap with the input gene set.
+          Biochemistry, molecular biology, pharmacology, and cell biology research papers commonly contain pathway diagrams. These diagrams capture the relationships between genes, cells, diseases, metabolites, drugs, cellular comportments, and other relevant terms. 
+          The <a  className='underline cursor' href='https://pfocr.wikipathways.org/' target='_blank'>Pathway Figure Optical Character Recognition (PFOCR)</a> 
+          <span> </span>is a open science initiative which extracts gene sets from published articles in PubMed Central (PMC). So far, PFOCR extracted <Stats show_gene_sets bold /> from pathway diagrams contained in <Stats show_pmcs bold />.
+          PFOCRummage serves these gene set for enrichment analysis, free text, and term search. Users of PFOCRummage can submit their own gene sets to find matching gene sets ranked by their overlap with the query gene set.
           </p>
           
           <br></br>
