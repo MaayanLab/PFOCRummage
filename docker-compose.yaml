@@ -4,6 +4,10 @@ services:
     build: .
     platform: linux/amd64
     image: maayanlab/pfocrummage:0.0.1
+    x-kubernetes:
+      imagePullPolicy: IfNotPresent
+      annotations:
+        maayanlab.cloud/ingress: https://pfocrummage.maayanlab.cloud
     environment:
       - PUBLIC_URL=https://pfocrummage.maayanlab.cloud
       - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@pfocrummage-postgres/$POSTGRES_DB
@@ -13,12 +17,12 @@ services:
       - NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
     ports:
       - 3000:3000
-    volumes:
-      - ./data/bot/output-clean.gmt:/app/public/latest.gmt:ro
   pfocrummage-enrich:
     build: enrich
     platform: linux/amd64
     image: maayanlab/pfocrummage-enrich:0.0.1
+    x-kubernetes:
+      imagePullPolicy: IfNotPresent
     environment:
       - 'ROCKET_DATABASES={postgres={url="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pfocrummage-postgres/${POSTGRES_DB}"}}'
     ports:
@@ -27,6 +31,8 @@ services:
     build: db
     platform: linux/amd64
     image: maayanlab/pfocrummage-postgres:0.0.1
+    x-kubernetes:
+      imagePullPolicy: IfNotPresent
     environment:
       - POSTGRES_DB
       - POSTGRES_USER
@@ -35,19 +41,19 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./data/postgres/:/var/lib/postgresql/data
+      - pfocrummage-data:/var/lib/postgresql/data
   pfocrummage-bot:
     build: bot
     platform: linux/amd64
     image: maayanlab/pfocrummage-bot:0.0.1
+    x-kubernetes:
+      imagePullPolicy: IfNotPresent
     command: ["bash", "-c", "cd /work/data && touch log && tail -f log"]
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pfocrummage-postgres:5432/${POSTGRES_DB}
       - ENRICH_URL=http://pfocrummage-enrich:8000
       - API_KEY
       - EMAIL
-    volumes:
-      - ./data/bot/:/work/data
     labels:
       ofelia.enabled: "true"
       # 0 second
@@ -58,3 +64,9 @@ services:
       # 1 day of week (monday)
       ofelia.job-exec.update-db.schedule: "0 8 21 * *"
       ofelia.job-exec.update-db.command: "/bin/sh -c '/work/bot.sh > /work/data/log 2> /work/data/log'"
+
+volumes:
+  pfocrummage-data:
+    x-kubernetes:
+      size: 20Gi
+      class: gp2
