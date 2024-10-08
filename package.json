@@ -9,8 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "generate": "graphql-codegen --config graphql.config.yml",
-    "version": "npm run build && ts-node src/cli/version-compose.ts && docker-compose build rummagene-app",
-    "postversion": "docker-compose push rummagene-app"
+    "version": "npm run build && ts-node src/cli/version-compose.ts && docker-compose build PFCORummage-app",
+    "postversion": "docker-compose push PFCORummage-app"
   },
   "dependencies": {
     "@apollo/client": "^3.8.0-rc.2",
