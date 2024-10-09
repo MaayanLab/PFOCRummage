@@ -27,7 +27,9 @@ export default async function About() {
           <span> </span>is a open science initiative which extracts gene sets from published articles in PubMed Central (PMC). So far, PFOCR extracted <Stats show_gene_sets bold /> from pathway diagrams contained in <Stats show_pmcs bold />.
           PFOCRummage serves these gene set for enrichment analysis, free text, and term search. Users of PFOCRummage can submit their own gene sets to find matching gene sets ranked by their overlap with the query gene set.
           </p>
+
           
+          <img className='mx-auto m-5 border-2 border-slate-400' src='/images/PFOCRummage_UMAP.svg' width={700} height={400} alt='PFOCR UMAP'></img>
           <br></br>
           <p>
             This database is updated monthly to use the latest human release of <a className='underline cursor' href='https://data.wikipathways.org/pfocr/current' target='_blank'>PFOCR</a>.
