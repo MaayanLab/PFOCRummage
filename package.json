@@ -1,6 +1,6 @@
 {
   "name": "pfocrummage",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "scripts": {
     "dev": "concurrently \"next dev\" \"npm run generate -- --watch ./src/graphql/**/*.graphql\"",
