@@ -8,6 +8,7 @@ import HomeLayout from '@/app/homeLayout'
 import Stats from '../stats'
 
 export function TermSearchResults({ terms }: { terms: string }) {
+  console.log(terms)
   const { data } = useTermSearchQuery({
     variables: {
       terms,
@@ -22,6 +23,7 @@ export function TermSearchResults({ terms }: { terms: string }) {
       </>
     )
   }
+  console.log('TermSearchResults re-rendered with props:', terms);
   return (
     <div className="flex flex-col gap-2 my-2">
       <h2 className="text-md font-bold">
@@ -41,7 +43,17 @@ const examples = [
 export default function TermSearchClientPage(props: { searchParams?: { page?: string, q?: string } }) {
   const [queryString, setQueryString] = useQsState({ page: props.searchParams?.page ?? '1', q: props.searchParams?.q ?? '' })
   const [rawTerms, setRawTerms] = React.useState('')
-  React.useEffect(() => {setRawTerms(queryString.q ?? '')}, [queryString.q])
+  React.useEffect(() => {
+    setRawTerms(queryString.q ?? '')}, [queryString.q])
+
+  const termSearchResults = React.useMemo(() => {
+      if (queryString.q) {
+        return <TermSearchResults terms={queryString.q} />;
+      }
+      return null;
+    }, [queryString.q]);
+
+  
   if (!queryString.q) {
     return (
       <HomeLayout>
@@ -82,6 +94,7 @@ export default function TermSearchClientPage(props: { searchParams?: { page?: st
       </HomeLayout>
     )
   } else {
+
     return (
       <>
       <div className='flex-col'>
@@ -106,7 +119,7 @@ export default function TermSearchClientPage(props: { searchParams?: { page?: st
             type="submit"
             className="btn normal-case"
           >Search gene sets</button>
-        <div> Query extracted gene set table titles to find relevant gene sets.</div>
+        <div> Query pathway diagrams based on their legends to find relevant gene sets</div>
         </form>
         <p className="prose p-2">
           try an example:&nbsp;
@@ -115,12 +128,15 @@ export default function TermSearchClientPage(props: { searchParams?: { page?: st
             <a
               key={example}
               className="font-bold text-sm cursor-pointer"
-              onClick={() => {setQueryString({ page: '1', q: example })}}
+              onClick={(evt) => {
+                evt.preventDefault()
+                setQueryString({ page: '1', q: example })
+              }}
             >{example}</a>
           ])}
         </p>
         </div>
-        {queryString.q ? <TermSearchResults terms={queryString.q} /> : null}
+       {termSearchResults}
       </>
     )
   }
