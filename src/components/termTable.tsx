@@ -46,6 +46,35 @@ export default function TermTable({ terms }: { terms: any[] }) {
     variables: { id: geneSetId },
   });
 
+  // State to store figure images
+  const [figImages, setFigImages] = useState<Record<string, string>>({});
+
+  // Fetch images for all terms when the component mounts or terms change
+  useEffect(() => {
+    const fetchImages = async () => {
+      const newFigImages: Record<string, string> = {};
+      await Promise.all(
+        terms.map(async (el) => {
+          if (el?.term) {
+            try {
+              const response = await fetch(`https://pfocr.wikipathways.org/figures/${el?.term}.html`);
+              const text = await response.text();
+              const match = text.match(/<a[^>]+href="([^"]+)"/i);
+              if (match && match[1]) {
+                newFigImages[el.term] = match[1];
+              }
+            } catch (error) {
+              console.error(`Failed to fetch image for term ${el.term}:`, error);
+            }
+          }
+        })
+      );
+      setFigImages(newFigImages);
+    };
+
+    fetchImages();
+  }, [terms]);
+
   return (
     <>
       <GeneSetModal
@@ -75,7 +104,7 @@ export default function TermTable({ terms }: { terms: any[] }) {
             <button
               className="btn join-item font-bold text-2xl pb-1"
               onClick={() => {
-                if (!dataFiltered) return;
+                if (!dataFiltered || dataFiltered.length === 0) return; // Prevent download if no results
                 const blob = blobTsv(['term', 'nGenes'], dataFiltered, item => ({
                   term: item.term,
                   nGenes: item.nGeneIds,
@@ -86,88 +115,79 @@ export default function TermTable({ terms }: { terms: any[] }) {
           </div>
         </div>
 
-        <table className="table table-xs table-pin-cols table-auto">
-          <thead>
-            <tr>
-              <td>Term</td>
-              <td>Figure</td>
-              <td>Thumbnail</td>
-              <td>Description</td>
-              <td>Gene Set</td>
-            </tr>
-          </thead>
-          <tbody>
-            {dataFiltered?.slice((page - 1) * pageSize, page * pageSize).map(el => {
-              const pmcid = el?.term?.split('_')[0];
-              const figure = el?.term?.split('_')[2];
-              const description = el?.description;
+        {dataFiltered.length === 0 ? (
+          <div className="text-center mt-5">
+            <p>No results found for your search.</p>
+          </div>
+        ) : (
+          <table className="table table-xs table-pin-cols table-auto">
+            <thead>
+              <tr>
+                <td>Term</td>
+                <td>Figure</td>
+                <td>Thumbnail</td>
+                <td>Description</td>
+                <td>Gene Set</td>
+              </tr>
+            </thead>
+            <tbody>
+              {dataFiltered?.slice((page - 1) * pageSize, page * pageSize).map(el => {
+                const pmcid = el?.term?.split('_')[0];
+                const figure = el?.term?.split('_')[2];
+                const description = el?.description;
 
-              // Fetch figImg inside each row
-              const [figImg, setFigImg] = useState('');
-
-              useEffect(() => {
-                if (el?.term) {
-                  fetch(`https://pfocr.wikipathways.org/figures/${el?.term}.html`)
-                    .then(response => response.text())
-                    .then(text => {
-                      let regex = /<a[^>]+href="([^"]+)"/i;
-                      let match = text.match(regex);
-                      if (match && match[1]) {
-                        setFigImg(match[1]);
-                      }
-                    });
-                }
-              }, [el?.term]);
-
-              return (
-                <tr key={el?.term}>
-                  <td>
-                    <a
-                      className="underline cursor-pointer"
-                      href={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >{pmcid}</a>
-                  </td>
-                  <td>
-                    <a
-                      className="underline cursor-pointer"
-                      href={`https://pfocr.wikipathways.org/figures/${el?.term}.html`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >{figure}</a>
-                  </td>
-                  <td>
-                    <a
-                      className="underline cursor-pointer"
-                      href={`https://pfocr.wikipathways.org/figures/${el?.term}.html`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <img
-                        src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImg.split('__')[1]?.replace('.html', '')}.jpg`}
-                        style={{ width: 'fit-content', height: '70px', margin: 'auto' }}
-                      />
-                    </a>
-                  </td>
-                  <td>{description}</td>
-                  <td className='w-3/12'>
-                    <button
-                      className='btn btn-xs btn-outline'
-                      onClick={() => {
-                        setCurrTerm(el?.term || '');
-                        setGeneSetId(el?.id || '');
-                        handleShowModal();
-                      }}
-                    >
-                      View Gene Set ({el?.nGeneIds})
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                return (
+                  <tr key={el?.term}>
+                    <td>
+                      <a
+                        className="underline cursor-pointer"
+                        href={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >{pmcid}</a>
+                    </td>
+                    <td>
+                      <a
+                        className="underline cursor-pointer"
+                        href={`https://pfocr.wikipathways.org/figures/${el?.term}.html`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >{figure}</a>
+                    </td>
+                    <td>
+                      <a
+                        className="underline cursor-pointer"
+                        href={`https://pfocr.wikipathways.org/figures/${el?.term}.html`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {figImages[el?.term] && (
+                          <img
+                            src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImages[el?.term]?.split('__')[1]?.replace('.html', '')}.jpg`}
+                            style={{ width: 'fit-content', height: '70px', margin: 'auto' }}
+                          />
+                        )}
+                      </a>
+                    </td>
+                    <td>{description}</td>
+                    <td className='w-3/12'>
+                      <button
+                        className='btn btn-xs btn-outline'
+                        onClick={() => {
+                          setCurrTerm(el?.term || '');
+                          setGeneSetId(el?.id || '');
+                          handleShowModal();
+                        }}
+                      >
+                        View Gene Set ({el?.nGeneIds})
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
 
       <div className="flex flex-col items-center">
