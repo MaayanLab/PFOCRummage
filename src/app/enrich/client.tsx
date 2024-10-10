@@ -180,7 +180,7 @@ const EnrichmentResults = React.memo(({ userGeneSet, setModalGeneSet }: { userGe
                   <td>
                     <a href={`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`} target="_blank" rel="noreferrer">
                         {figImages[pmcid_figure ?? ''] ? (
-                          <img src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImages[pmcid_figure]}.jpg`} style={{ width: 'fit-content', height: '70px' }} />
+                          <img src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImages[pmcid_figure ?? '']}.jpg`} style={{ width: 'fit-content', height: '70px' }} />
                         ) : (
                           <Loading />
                         )}
