@@ -20,7 +20,7 @@ services:
   pfocrummage-enrich:
     build: enrich
     platform: linux/amd64
-    image: maayanlab/pfocrummage-enrich:0.0.1
+    image: maayanlab/pfocrummage-enrich:0.0.2
     x-kubernetes:
       imagePullPolicy: IfNotPresent
     environment:
