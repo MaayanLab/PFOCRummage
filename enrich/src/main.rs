@@ -337,7 +337,7 @@ async fn query(
             let (gene_set_hash, _gene_set) = bitmap.values.get(result.index)?;
             if let Some(filter_term) = &filter_term {
                 if let Some(terms) = bitmap.terms.get(gene_set_hash) {
-                    if !terms.iter().any(|(_gene_set_id, gene_set_term, _gene_set_description)| gene_set_term.to_lowercase().contains(filter_term)) {
+                    if !terms.iter().any(|(_gene_set_id, gene_set_term, gene_set_description)|  gene_set_term.to_lowercase().contains(filter_term) || gene_set_description.to_lowercase().contains(filter_term)) {
                         return None
                     }
                 }
