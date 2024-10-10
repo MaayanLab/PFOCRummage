@@ -35,10 +35,10 @@ export default function GeneSetModal({ geneset, term, showModal, setShowModal }:
         <>
             <dialog className="modal" ref={ref}>
                 <div className="modal-box w-11/12 max-w-screen-xl h-5/6 overflow-hidden flex flex-col p-0">
-                    <p className="text-md text-center text-gray-900 dark:text-white flex-shrink-0 py-2">
+                    <p className="text-md text-center text-gray-900  flex-shrink-0 py-2">
                         Gene Set  ({geneset ? geneset?.length : 'n'})
                     </p>
-                    <p className="text-md text-center text-gray-600 dark:text-white">{term}</p>
+                    <p className="text-md text-center text-gray-600 ">{term}</p>
                     <div className={classNames("p-2 text-slate-500 text-sm leading-relaxed whitespace-pre-line overflow-hidden flex flex-grow flex-shrink")}>
                         {geneset ?
                             <div className="overflow-x-auto block">
