@@ -15,7 +15,6 @@ import useQsState from '@/utils/useQsState';
 import Stats from '../stats';
 import Image from 'next/image';
 import GeneSetModal from '@/components/geneSetModal';
-import partition from '@/utils/partition';
 
 const pageSize = 10;
 
@@ -34,18 +33,6 @@ type GeneSetModalT = {
   description: string,
 } | undefined;
 
-function description_markdown(text: string) {
-  if (!text) return <span className="italic">No description found</span>;
-  const m = /\*\*(.+?)\*\*/.exec(text);
-  if (m) return (
-    <>
-      <span>{text.slice(0, m.index)}</span>
-      <span className="font-bold italic">{m[1]}</span>
-      <span>{text.slice(m.index + 4 + m[1].length)}</span>
-    </>
-  );
-  return text;
-}
 
 const EnrichmentResults = React.memo(({ userGeneSet, setModalGeneSet }: { userGeneSet?: FetchUserGeneSetQuery, setModalGeneSet: React.Dispatch<React.SetStateAction<GeneSetModalT>> }) => {
   const genes = useMemo(() => 
@@ -219,6 +206,8 @@ const EnrichmentResults = React.memo(({ userGeneSet, setModalGeneSet }: { userGe
   );
 });
 
+EnrichmentResults.displayName = 'EnrichmentResults';
+
 const GeneSetModalWrapper = React.memo(({ modalGeneSet, setModalGeneSet }: { modalGeneSet: GeneSetModalT, setModalGeneSet: React.Dispatch<React.SetStateAction<GeneSetModalT>> }) => {
   const { data: geneSet } = useViewGeneSetQuery({
     skip: modalGeneSet?.type !== 'GeneSet',
@@ -252,6 +241,8 @@ const GeneSetModalWrapper = React.memo(({ modalGeneSet, setModalGeneSet }: { mod
   );
 });
 
+GeneSetModalWrapper.displayName = 'GeneSetModalWrapper';
+
 const EnrichClientPage = React.memo(({ searchParams }: { searchParams: { dataset: string | string[] | undefined } }) => {
   const dataset = ensureArray(searchParams.dataset)[0];
   const { data: userGeneSet } = useFetchUserGeneSetQuery({
@@ -283,5 +274,7 @@ const EnrichClientPage = React.memo(({ searchParams }: { searchParams: { dataset
     </>
   );
 });
+
+EnrichClientPage.displayName = 'EnrichClientPage';
 
 export default EnrichClientPage;
