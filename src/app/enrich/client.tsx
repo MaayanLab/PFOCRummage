@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import {
   FetchUserGeneSetQuery,
   useEnrichmentQueryQuery,
@@ -7,17 +7,17 @@ import {
   useFetchUserGeneSetQuery,
   useOverlapQueryQuery,
   useViewGeneSetQuery
-} from '@/graphql'
-import ensureArray from "@/utils/ensureArray"
-import Loading from '@/components/loading'
-import Pagination from '@/components/pagination'
-import useQsState from '@/utils/useQsState'
-import Stats from '../stats'
-import Image from 'next/image'
-import GeneSetModal from '@/components/geneSetModal'
-import partition from '@/utils/partition'
+} from '@/graphql';
+import ensureArray from "@/utils/ensureArray";
+import Loading from '@/components/loading';
+import Pagination from '@/components/pagination';
+import useQsState from '@/utils/useQsState';
+import Stats from '../stats';
+import Image from 'next/image';
+import GeneSetModal from '@/components/geneSetModal';
+import partition from '@/utils/partition';
 
-const pageSize = 10
+const pageSize = 10;
 
 type GeneSetModalT = {
   type: 'UserGeneSet',
@@ -32,32 +32,83 @@ type GeneSetModalT = {
   type: 'GeneSet',
   id: string,
   description: string,
-} | undefined
+} | undefined;
 
 function description_markdown(text: string) {
-  if (!text) return <span className="italic">No description found</span>
-  const m = /\*\*(.+?)\*\*/.exec(text)
-  if (m) return <><span>{text.slice(0, m.index)}</span><span className="font-bold italic">{m[1]}</span><span>{text.slice(m.index + 4 + m[1].length)}</span></>
-  return text
+  if (!text) return <span className="italic">No description found</span>;
+  const m = /\*\*(.+?)\*\*/.exec(text);
+  if (m) return (
+    <>
+      <span>{text.slice(0, m.index)}</span>
+      <span className="font-bold italic">{m[1]}</span>
+      <span>{text.slice(m.index + 4 + m[1].length)}</span>
+    </>
+  );
+  return text;
 }
 
-function Breakable(props: { children: string }) {
-  return props.children.split('_').map((part, i) => <React.Fragment key={i}>{(i === 0 ? '' : '_') + part}<wbr /></React.Fragment>)
-}
-
-function EnrichmentResults({ userGeneSet, setModalGeneSet }: { userGeneSet?: FetchUserGeneSetQuery, setModalGeneSet: React.Dispatch<React.SetStateAction<GeneSetModalT>> }) {
-  const genes = React.useMemo(() =>
-    ensureArray(userGeneSet?.userGeneSet?.genes).filter((gene): gene is string => !!gene).map(gene => gene.toUpperCase()),
+const EnrichmentResults = React.memo(({ userGeneSet, setModalGeneSet }: { userGeneSet?: FetchUserGeneSetQuery, setModalGeneSet: React.Dispatch<React.SetStateAction<GeneSetModalT>> }) => {
+  const genes = useMemo(() => 
+    ensureArray(userGeneSet?.userGeneSet?.genes).filter((gene): gene is string => !!gene).map(gene => gene.toUpperCase()), 
     [userGeneSet]
-  )
-  const [queryString, setQueryString] = useQsState({ page:  '1', q: '' })
-  const [rawTerm, setRawTerm] = React.useState('')
-  const { page, term } = React.useMemo(() => ({ page: queryString.page ? +queryString.page : 1, term: queryString.q ?? '' }), [queryString])
+  );
+
+  const [queryString, setQueryString] = useQsState({ page: '1', q: '' });
+  const [rawTerm, setRawTerm] = useState('');
+  const [figImages, setFigImages] = useState<Record<string, string>>({});
+  
+  const { page, term } = useMemo(() => ({
+    page: queryString.page ? +queryString.page : 1,
+    term: queryString.q ?? ''
+  }), [queryString]);
+
   const { data: enrichmentResults } = useEnrichmentQueryQuery({
     skip: genes.length === 0,
-    variables: { genes, filterTerm: term, offset: (page-1)*pageSize, first: pageSize },
-  })
-  React.useEffect(() => {setRawTerm(term)}, [term])
+    variables: { genes, filterTerm: term, offset: (page - 1) * pageSize, first: pageSize },
+  });
+
+  useEffect(() => {
+    setRawTerm(term);
+  }, [term]);
+
+  const handleSubmit = useCallback((evt: React.FormEvent) => {
+    evt.preventDefault();
+    setQueryString({ page: '1', q: rawTerm });
+  }, [rawTerm, setQueryString]);
+
+  const handleClear = useCallback(() => {
+    setQueryString({ page: '1', q: '' });
+  }, [setQueryString]);
+
+  useEffect(() => {
+    const fetchFigImages = async () => {
+      const newFigImages: Record<string, string> = {};
+      const fetchPromises = enrichmentResults?.currentBackground?.enrich?.nodes?.map(async (enrichmentResult) => {
+        const pmcid_figure = enrichmentResult?.geneSets.nodes[0].term;
+        try {
+          const response = await fetch(`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`);
+          const text = await response.text();
+          const match = text.match(/<a[^>]+href="([^"]+)"/i);
+          if (match && match[1]) {
+            const figImg = match[1].split('__')[1].replace('.html', '');
+            newFigImages[pmcid_figure ?? ''] = figImg;
+          }
+        } catch (error) {
+          console.error(`Failed to fetch image for term ${pmcid_figure}:`, error);
+        }
+      });
+
+      if (fetchPromises) {
+        await Promise.all(fetchPromises);
+        setFigImages(newFigImages);
+      }
+    };
+
+    if (enrichmentResults?.currentBackground?.enrich) {
+      fetchFigImages();
+    }
+  }, [enrichmentResults]);
+
   return (
     <div className="flex flex-col gap-2 my-2">
       <h2 className="text-md font-bold">
@@ -67,38 +118,23 @@ function EnrichmentResults({ userGeneSet, setModalGeneSet }: { userGeneSet?: Fet
       </h2>
       <form
         className="join flex flex-row place-content-end place-items-center"
-        onSubmit={evt => {
-          evt.preventDefault()
-          setQueryString({ page: '1', q: rawTerm })
-        }}
+        onSubmit={handleSubmit}
       >
         <input
           type="text"
           className="input input-bordered join-item"
           value={rawTerm}
-          onChange={evt => {setRawTerm(evt.currentTarget.value)}}
+          onChange={evt => { setRawTerm(evt.currentTarget.value); }}
         />
         <div className="tooltip" data-tip="Search results">
-          <button
-            type="submit"
-            className="btn join-item"
-          >&#x1F50D;</button>
+          <button type="submit" className="btn join-item">&#x1F50D;</button>
         </div>
         <div className="tooltip" data-tip="Clear search">
-          <button
-            type="reset"
-            className="btn join-item"
-            onClick={evt => {
-              setQueryString({ page: '1', q: '' })
-            }}
-          >&#x232B;</button>
+          <button type="reset" className="btn join-item" onClick={handleClear}>&#x232B;</button>
         </div>
         <a href={`/enrich/download?dataset=${queryString.dataset}&q=${queryString.q}`} download="results.tsv">
           <div className="tooltip" data-tip="Download results">
-            <button
-              type="button"
-              className="btn join-item font-bold text-2xl pb-1"
-            >&#x21E9;</button>
+            <button type="button" className="btn join-item font-bold text-2xl pb-1">&#x21E9;</button>
           </div>
         </a>
       </form>
@@ -123,167 +159,108 @@ function EnrichmentResults({ userGeneSet, setModalGeneSet }: { userGeneSet?: Fet
               <tr>
                 <td colSpan={7}><Loading /></td>
               </tr>
-            : null}
-            {enrichmentResults?.currentBackground?.enrich?.nodes?.flatMap(async (enrichmentResult, genesetIndex) => {
-              if (!enrichmentResult?.geneSets) return null
-              const pmcid_figure = enrichmentResult.geneSets.nodes[0].term
-              const pmcid = pmcid_figure.split('_')[0]
-              const figure = pmcid_figure.split('_')[2]
-              const title = enrichmentResult.geneSets.nodes[0].geneSetPmcsById.nodes[0].pmcInfoByPmcid?.title || ''
-              const description = enrichmentResult.geneSets.nodes[0].description
-              const nGeneIds = enrichmentResult.geneSets.nodes[0].nGeneIds
-              const geneSetId = enrichmentResult.geneSets.nodes[0].id
-              const figImg = await fetch(`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`)
-              .then(response => response.text())
-              .then(text => {
-                let regex = /<a[^>]+href="([^"]+)"/i;
-
-                let match = text.match(regex);
-
-                // Extract the content
-                if (match && match[1]) {
-                  return match[1];
-                } else return ''
-            })
-
-
+              : null}
+            {enrichmentResults?.currentBackground?.enrich?.nodes?.map((enrichmentResult, genesetIndex) => {
+              const pmcid_figure = enrichmentResult?.geneSets.nodes[0].term;
+              const pmcid = pmcid_figure?.split('_')[0];
+              const figure = pmcid_figure?.split('_')[2];
+              const title = enrichmentResult?.geneSets.nodes[0].geneSetPmcsById.nodes[0].pmcInfoByPmcid?.title || '';
+              const description = enrichmentResult?.geneSets.nodes[0].description;
+              const nGeneIds = enrichmentResult?.geneSets.nodes[0].nGeneIds;
+              const geneSetId = enrichmentResult?.geneSets.nodes[0].id;
+              
               return (
-                    <tr key={`${genesetIndex}`} className="border-b-0">
-                      <th>
-                          <a
-                            className="underline cursor-pointer"
-                            href={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >{pmcid}</a>
-                        </th>
-                        <th>
-                          <a
-                            className="underline cursor-pointer"
-                            href={`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >{figure}</a>
-                        </th>
-                        <td>
-                        <a
-                            className="underline cursor-pointer"
-                            href={`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`}
-                            target="_blank"
-                            rel="noreferrer"
-                          ><img src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImg.split('__')[1].replace('.html', '')}.jpg`} style={{ width: 'fit-content', height: '70px', alignContent: 'center', margin: 'auto'}} /></a>
-                        </td>
-                        <td>
-                          {title}
-                        </td>
-                        <td>
-                          {description}
-                        </td>
-                        <td>
-                          <label
-                            htmlFor="geneSetModal"
-                            className="prose underline cursor-pointer"
-                            onClick={evt => {
-                              setModalGeneSet({
-                                type: 'GeneSet',
-                                id: geneSetId,
-                                description: pmcid_figure ?? '',
-                              })
-                            }}
-                          >{nGeneIds}</label>
-                        </td>
-                        <td className="whitespace-nowrap text-underline cursor-pointer">
-                            <label
-                              htmlFor="geneSetModal"
-                              className="prose underline cursor-pointer"
-                              onClick={evt => {
-                                setModalGeneSet({
-                                  type: 'GeneSetOverlap',
-                                  id: geneSetId,
-                                  description: `${userGeneSet?.userGeneSet?.description || 'User gene set'} & ${pmcid_figure || 'PFOCR gene set'}`,
-                                  genes,
-                                })
-                              }}
-                            >{enrichmentResult?.nOverlap}</label>
-                          </td>
-                          <td className="whitespace-nowrap">{enrichmentResult?.oddsRatio?.toPrecision(3)}</td>
-                          <td className="whitespace-nowrap">{enrichmentResult?.pvalue?.toPrecision(3)}</td>
-                          <td className="whitespace-nowrap">{enrichmentResult?.adjPvalue?.toPrecision(3)}</td>
-                      </tr>)
-            }
-          )
-        }
+                <tr key={`${genesetIndex}`} className="border-b-0">
+                  <th>
+                    <a className="underline cursor-pointer" href={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/`} target="_blank" rel="noreferrer">{pmcid}</a>
+                  </th>
+                  <th>
+                    <a className="underline cursor-pointer" href={`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`} target="_blank" rel="noreferrer">{figure}</a>
+                  </th>
+                  <td>
+                    <a href={`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`} target="_blank" rel="noreferrer">
+                        {figImages[pmcid_figure ?? ''] ? (
+                          <img src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImages[pmcid_figure]}.jpg`} style={{ width: 'fit-content', height: '70px' }} />
+                        ) : (
+                          <Loading />
+                        )}
+                      </a>
+                  </td>
+                  <td>{title}</td>
+                  <td>{description}</td>
+                  <td>
+                    <label htmlFor="geneSetModal" className="prose underline cursor-pointer" onClick={() => setModalGeneSet({ type: 'GeneSet', id: geneSetId, description: pmcid_figure ?? '' })}>{nGeneIds}</label>
+                  </td>
+                  <td className="whitespace-nowrap text-underline cursor-pointer">
+                    <label htmlFor="geneSetModal" className="prose underline cursor-pointer" onClick={() => setModalGeneSet({ type: 'GeneSetOverlap', id: geneSetId, description: `${userGeneSet?.userGeneSet?.description || 'User gene set'} & ${pmcid_figure || 'PFOCR gene set'}`, genes })}>
+                      {enrichmentResult?.nOverlap}
+                    </label>
+                  </td>
+                  <td className="whitespace-nowrap">{enrichmentResult?.oddsRatio?.toPrecision(3)}</td>
+                  <td className="whitespace-nowrap">{enrichmentResult?.pvalue?.toPrecision(3)}</td>
+                  <td className="whitespace-nowrap">{enrichmentResult?.adjPvalue?.toPrecision(3)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      {enrichmentResults?.currentBackground?.enrich ?
+      {enrichmentResults?.currentBackground?.enrich && (
         <div className="w-full flex flex-col items-center">
           <Pagination
             page={page}
-            totalCount={enrichmentResults?.currentBackground?.enrich?.totalCount ? enrichmentResults?.currentBackground?.enrich.totalCount : undefined}
+            totalCount={enrichmentResults?.currentBackground?.enrich?.totalCount ?? 0}
             pageSize={pageSize}
-            onChange={page => {
-              setQueryString({ page: `${page}`, q: term })
-            }}
+            onChange={page => setQueryString({ page: `${page}`, q: term })}
           />
         </div>
-      : null}
+      )}
     </div>
-  )
-}
+  );
+});
 
-function GeneSetModalWrapper(props: { modalGeneSet: GeneSetModalT, setModalGeneSet: React.Dispatch<React.SetStateAction<GeneSetModalT>> }) {
+const GeneSetModalWrapper = React.memo(({ modalGeneSet, setModalGeneSet }: { modalGeneSet: GeneSetModalT, setModalGeneSet: React.Dispatch<React.SetStateAction<GeneSetModalT>> }) => {
   const { data: geneSet } = useViewGeneSetQuery({
-    skip: props.modalGeneSet?.type !== 'GeneSet',
-    variables: props.modalGeneSet?.type === 'GeneSet' ? {
-      id: props.modalGeneSet.id,
-    } : undefined
-  })
+    skip: modalGeneSet?.type !== 'GeneSet',
+    variables: modalGeneSet?.type === 'GeneSet' ? { id: modalGeneSet.id } : undefined,
+  });
+  
   const { data: overlap } = useOverlapQueryQuery({
-    skip: props.modalGeneSet?.type !== 'GeneSetOverlap',
-    variables: props.modalGeneSet?.type === 'GeneSetOverlap' ?  {
-      id: props.modalGeneSet.id,
-      genes: props.modalGeneSet?.genes,
-    } : undefined,
-  })
+    skip: modalGeneSet?.type !== 'GeneSetOverlap',
+    variables: modalGeneSet?.type === 'GeneSetOverlap' ? { id: modalGeneSet.id, genes: modalGeneSet?.genes } : undefined,
+  });
+
   const { data: userGeneSet } = useFetchGeneInfoQuery({
-    skip: props.modalGeneSet?.type !== 'UserGeneSet',
-    variables: props.modalGeneSet?.type === 'UserGeneSet' ? {
-      genes: props.modalGeneSet.genes,
-    } : undefined,
-  })
+    skip: modalGeneSet?.type !== 'UserGeneSet',
+    variables: modalGeneSet?.type === 'UserGeneSet' ? { genes: modalGeneSet.genes } : undefined,
+  });
+
   return (
     <GeneSetModal
-      showModal={props.modalGeneSet !== undefined}
-      term={props.modalGeneSet?.description}
+      showModal={modalGeneSet !== undefined}
+      term={modalGeneSet?.description}
       geneset={
-        props.modalGeneSet?.type === 'GeneSet' ? geneSet?.geneSet?.genes.nodes
-        : props.modalGeneSet?.type === 'GeneSetOverlap' ? overlap?.geneSet?.overlap.nodes
-        : props.modalGeneSet?.type === 'UserGeneSet' ?
-          userGeneSet?.geneMap2?.nodes ? userGeneSet.geneMap2.nodes.map(({ gene, geneInfo }) => ({gene, ...geneInfo}))
-          : props.modalGeneSet.genes.map(symbol => ({ symbol }))
-        : undefined
+        modalGeneSet?.type === 'GeneSet' ? geneSet?.geneSet?.genes.nodes
+          : modalGeneSet?.type === 'GeneSetOverlap' ? overlap?.geneSet?.overlap.nodes
+          : modalGeneSet?.type === 'UserGeneSet' ? userGeneSet?.geneMap2?.nodes.map(({ gene, geneInfo }) => ({ gene, ...geneInfo }))
+          : undefined
       }
       setShowModal={show => {
-        if (!show) props.setModalGeneSet(undefined)
+        if (!show) setModalGeneSet(undefined);
       }}
     />
-  )
-}
+  );
+});
 
-export default function EnrichClientPage({
-  searchParams
-}: {
-  searchParams: {
-    dataset: string | string[] | undefined
-  },
-}) {
-  const dataset = ensureArray(searchParams.dataset)[0]
+const EnrichClientPage = React.memo(({ searchParams }: { searchParams: { dataset: string | string[] | undefined } }) => {
+  const dataset = ensureArray(searchParams.dataset)[0];
   const { data: userGeneSet } = useFetchUserGeneSetQuery({
     skip: !dataset,
     variables: { id: dataset },
-  })
-  const [modalGeneSet, setModalGeneSet] = React.useState<GeneSetModalT>()
+  });
+
+  const [modalGeneSet, setModalGeneSet] = useState<GeneSetModalT>();
+
   return (
     <>
       <div className="flex flex-row gap-2 alert">
@@ -291,17 +268,20 @@ export default function EnrichClientPage({
         <label
           htmlFor="geneSetModal"
           className="prose underline cursor-pointer"
-          onClick={evt => {
-            setModalGeneSet({
-              type: 'UserGeneSet',
-              genes: (userGeneSet?.userGeneSet?.genes ?? []).filter((gene): gene is string => !!gene),
-              description: userGeneSet?.userGeneSet?.description || 'Gene set',
-            })
-          }}
-        >{userGeneSet?.userGeneSet?.description || 'Gene set'}{userGeneSet ? <> ({userGeneSet?.userGeneSet?.genes?.length ?? '?'} genes)</> : null}</label>
+          onClick={() => setModalGeneSet({
+            type: 'UserGeneSet',
+            genes: (userGeneSet?.userGeneSet?.genes ?? []).filter((gene): gene is string => !!gene),
+            description: userGeneSet?.userGeneSet?.description || 'Gene set',
+          })}
+        >
+          {userGeneSet?.userGeneSet?.description || 'Gene set'}
+          {userGeneSet ? <> ({userGeneSet?.userGeneSet?.genes?.length ?? '?'} genes)</> : null}
+        </label>
       </div>
       <EnrichmentResults userGeneSet={userGeneSet} setModalGeneSet={setModalGeneSet} />
       <GeneSetModalWrapper modalGeneSet={modalGeneSet} setModalGeneSet={setModalGeneSet} />
     </>
-  )
-}
+  );
+});
+
+export default EnrichClientPage;
