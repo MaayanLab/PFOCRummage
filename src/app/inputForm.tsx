@@ -63,7 +63,7 @@ export default function InputForm() {
           placeholder="Paste a set of valid Entrez gene symbols (e.g. STAT3) on each row in the text-box"
         />
         <input
-            className="block w-full mb-5 text-xs text-gray-900 cursor-pointer"
+            className="block w-full mb-5 text-xs text-gray-900 cursor-pointer dark:text-white"
             id="fileUpload"
             type="file"
             onChange={(e) => {handleFileChosen(e.target.files?.[0] || null)}}/>
