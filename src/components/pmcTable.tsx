@@ -30,7 +30,6 @@ export default function PmcTable({ terms, data, gene_set_ids }: { terms?: Map<st
       return (rowToSearch?.toLowerCase().includes(searchTerm.toLowerCase()));
     }),
   [data, terms, searchTerm]);
-  console.log(dataFiltered)
 
   const [geneSetId, setGeneSetId] = React.useState<string | null>(gene_set_ids?.values().next().value?.at(0) || '');
   const [currTerm, setCurrTerm] = React.useState<string | null>(gene_set_ids?.keys().next().value?.at(0) || '');
@@ -38,33 +37,31 @@ export default function PmcTable({ terms, data, gene_set_ids }: { terms?: Map<st
   const genesQuery = useViewGeneSetQuery({ variables: { id: geneSetId } });
 
   const [figImages, setFigImages] = React.useState<Record<string, string>>({});
-
   // Fetch image URLs based on searchTerm
   React.useEffect(() => {
-    const fetchFigImages = async () => {
+    const fetchImages = async () => {
       const newFigImages: Record<string, string> = {};
-      const fetchPromises = (terms ? Array.from(terms.keys()) : []).map(async term => {
-        try {
-          const response = await fetch(`https://pfocr.wikipathways.org/figures/${term}.html`);
-          const text = await response.text();
-          const match = text.match(/<a[^>]+href="([^"]+)"/i);
-          if (match && match[1]) {
-            const figImg = match[1].split('__')[1].replace('.html', '');
-            newFigImages[term] = figImg;
+      await Promise.all(
+        Array.from(terms?.values() || []).map(async (el) => {
+          if (el[0]) {
+            try {
+              const response = await fetch(`https://pfocr.wikipathways.org/figures/${el[0]}.html`);
+              const text = await response.text();
+              const match = text.match(/<a[^>]+href="([^"]+)"/i);
+              if (match && match[1]) {
+                newFigImages[el[0]] = match[1];
+              }
+            } catch (error) {
+              console.error(`Failed to fetch image for term ${el}:`, error);
+            }
           }
-        } catch (error) {
-          console.error(`Failed to fetch image for term ${term}:`, error);
-        }
-      });
-      await Promise.all(fetchPromises);
+        })
+      );
       setFigImages(newFigImages);
     };
 
-    if (terms?.size && searchTerm) { // Only fetch if there are terms and a search term
-      fetchFigImages();
-    }
-  }, [terms, searchTerm]); // This now depends on searchTerm
-
+    fetchImages();
+  }, [terms]);// This now depends on searchTerm
   return (
     <>
       <GeneSetModal geneset={genesQuery?.data?.geneSet?.genes.nodes} term={currTerm} showModal={showModal} setShowModal={setShowModal}></GeneSetModal>
@@ -168,9 +165,14 @@ export default function PmcTable({ terms, data, gene_set_ids }: { terms?: Map<st
                             target="_blank"
                             rel="noreferrer"
                           >
+                            
                             {figImg && (
-                              <img src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImg}.jpg`} style={{ width: 'fit-content', height: '70px', alignContent: 'center', margin: 'auto' }} />
-                            )}
+                          <img
+                            src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImg?.split('__')[1]?.replace('.html', '')}.jpg`}
+                            style={{ width: 'fit-content', height: '70px', margin: 'auto' }}
+                          />
+                        )}
+                            
                           </a>
                         </td>
                         <td colSpan={2}>
