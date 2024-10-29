@@ -168,7 +168,7 @@ export default function PmcTable({ terms, data, gene_set_ids }: { terms?: Map<st
                             
                             {figImg && (
                           <img
-                            src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImg?.split('__')[1]?.replace('.html', '')}.jpg`}
+                            src={`https://europepmc.org/articles/${pmcid}/bin/${figImg?.split('__')[1]?.replace('.html', '')}.jpg`}
                             style={{ width: 'fit-content', height: '70px', margin: 'auto' }}
                           />
                         )}

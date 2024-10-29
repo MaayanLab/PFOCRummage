@@ -163,7 +163,7 @@ export default function TermTable({ terms }: { terms: any[] }) {
                       >
                         {figImages[el?.term] && (
                           <img
-                            src={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/bin/${figImages[el?.term]?.split('__')[1]?.replace('.html', '')}.jpg`}
+                            src={`https://europepmc.org/articles/${pmcid}/bin/${figImages[el?.term]?.split('__')[1]?.replace('.html', '')}.jpg`}
                             style={{ width: 'fit-content', height: '70px', margin: 'auto' }}
                           />
                         )}
