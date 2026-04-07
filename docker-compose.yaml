@@ -3,7 +3,7 @@ services:
   pfocrummage-app:
     build: .
     platform: linux/amd64
-    image: maayanlab/pfocrummage:0.0.11
+    image: maayanlab/pfocrummage:0.0.12
     x-kubernetes:
       imagePullPolicy: IfNotPresent
       annotations:
