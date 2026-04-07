@@ -73,12 +73,17 @@ const EnrichmentResults = React.memo(({ userGeneSet, setModalGeneSet }: { userGe
       const fetchPromises = enrichmentResults?.currentBackground?.enrich?.nodes?.map(async (enrichmentResult) => {
         const pmcid_figure = enrichmentResult?.geneSets.nodes[0].term;
         try {
-          const response = await fetch(`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`);
-          const text = await response.text();
-          const match = text.match(/<a[^>]+href="([^"]+)"/i);
-          if (match && match[1]) {
-            const figImg = match[1].split('__')[1].replace('.html', '');
+          const response = await fetch(`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`, { 'redirect': 'manual' });
+          if (response.redirected) {
+            const figImg = response.url.split('__')[1].replace('.html', '');
             newFigImages[pmcid_figure ?? ''] = figImg;
+          } else if (response.ok) {
+            const text = await response.text();
+            const match = text.match(/<a[^>]+href="([^"]+)"/i);
+            if (match && match[1]) {
+              const figImg = match[1].split('__')[1].replace('.html', '');
+              newFigImages[pmcid_figure ?? ''] = figImg;
+            }
           }
         } catch (error) {
           console.error(`Failed to fetch image for term ${pmcid_figure}:`, error);
