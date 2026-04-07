@@ -4,5 +4,5 @@ ADD package.json .
 ADD package-lock.json .
 RUN npm i
 ADD . .
-RUN npm run build && rm .env
+RUN PUBLIC_URL=https://pfocrummage.maayanlab.cloud npm run build && rm .env
 CMD ["npm", "start"]
