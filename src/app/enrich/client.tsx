@@ -160,19 +160,20 @@ const EnrichmentResults = React.memo(({ userGeneSet, setModalGeneSet }: { userGe
               const description = enrichmentResult?.geneSets.nodes[0].description;
               const nGeneIds = enrichmentResult?.geneSets.nodes[0].nGeneIds;
               const geneSetId = enrichmentResult?.geneSets.nodes[0].id;
-              
+              const pathway_url = `https://pfocr.wikipathways.org/figures/${(pmcid_figure && pmcid_figure in figImages) ? `${pmcid as string}__${figImages[pmcid_figure]}` : pmcid_figure}.html`
+              const thumbnail_url = pmcid_figure && pmcid_figure in figImages ? `https://europepmc.org/api/fulltextRepo?pmcId=${pmcid}&type=FILE&fileName=${figImages[pmcid_figure]}.jpg&mimeType=image/jpg` : undefined
               return (
                 <tr key={`${genesetIndex}`} className="border-b-0">
                   <th>
                     <a className="underline cursor-pointer" href={`https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/`} target="_blank" rel="noreferrer">{pmcid}</a>
                   </th>
                   <th>
-                    <a className="underline cursor-pointer" href={`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`} target="_blank" rel="noreferrer">{figure}</a>
+                    <a className="underline cursor-pointer" href={pathway_url} target="_blank" rel="noreferrer">{figure}</a>
                   </th>
                   <td>
-                    <a href={`https://pfocr.wikipathways.org/figures/${pmcid_figure}.html`} target="_blank" rel="noreferrer">
-                        {figImages[pmcid_figure ?? ''] ? (
-                          <img src={`https://europepmc.org/api/fulltextRepo?pmcId=${pmcid}&type=FILE&fileName=${figImages[pmcid_figure ?? '']}.jpg&mimeType=image/jpg`} style={{ width: 'fit-content', height: '70px' }} />
+                    <a href={pathway_url} target="_blank" rel="noreferrer">
+                        {thumbnail_url ? (
+                          <img src={thumbnail_url} style={{ width: 'fit-content', height: '70px' }} />
                         ) : (
                           <Loading />
                         )}
