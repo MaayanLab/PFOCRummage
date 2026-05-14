@@ -21,6 +21,8 @@ services:
     build: enrich
     platform: linux/amd64
     image: maayanlab/pfocrummage-enrich:0.1.0
+    x-kubernetes:
+      imagePullPolicy: IfNotPresent
     environment:
       - 'ROCKET_DATABASES={postgres={url="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pfocrummage-postgres/${POSTGRES_DB}"}}'
     ports:
