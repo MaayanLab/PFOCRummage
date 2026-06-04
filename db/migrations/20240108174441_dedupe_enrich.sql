@@ -128,7 +128,7 @@ create or replace function app_private_v2.indexed_enrich(
   if offset: params['offset'] = offset
   if first: params['limit'] = first
   req = requests.post(
-    f"http://rummagene-enrich:8000/{background['id']}",
+    f"{os.environ.get('ENRICH_URL', 'http://rummagene-enrich:8000')}/{background['id']}",
     params=params,
     json=gene_ids,
   )

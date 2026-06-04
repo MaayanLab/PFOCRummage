@@ -10,7 +10,7 @@ services:
         maayanlab.cloud/ingress: https://pfocrummage.maayanlab.cloud
     environment:
       - PUBLIC_URL=https://pfocrummage.maayanlab.cloud
-      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@pfocrummage-postgres/$POSTGRES_DB
+      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@pfocrummage-postgres:5432/$POSTGRES_DB
       - AUTHORIZATION_HEADER=$AUTHORIZATION_HEADER
       - NODE_ENV=production
       - ENRICH_URL=http://pfocrummage-enrich:8000
@@ -24,7 +24,7 @@ services:
     x-kubernetes:
       imagePullPolicy: IfNotPresent
     environment:
-      - 'ROCKET_DATABASES={postgres={url="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pfocrummage-postgres/${POSTGRES_DB}"}}'
+      - 'ROCKET_DATABASES={postgres={url="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pfocrummage-postgres:5432/${POSTGRES_DB}"}}'
     ports:
       - 8000:8000
   pfocrummage-postgres:
